@@ -3,6 +3,7 @@ package com.productservice.controller;
 import com.productservice.converter.ProductConevrter;
 import com.productservice.enity.Product;
 import com.productservice.mdel.ProductRequest;
+import com.productservice.mdel.ProductResponse;
 import com.productservice.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1/product")
 @Log4j2
@@ -24,10 +27,22 @@ public class ProductController {
     ProductService productService;
 
     @PutMapping
-   public ResponseEntity<String> post(@RequestBody ProductRequest productRequest){
+   public ResponseEntity<String> updateProduct(@RequestBody ProductRequest productRequest){
+
+        log.info("Received product with productID = " + productRequest.getProductId());
         productService.save(productRequest);
-        return new ResponseEntity<String>("updated",HttpStatus.CREATED);
+        return new ResponseEntity<>("Updated",HttpStatus.CREATED);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable("id") Integer id){
+        ProductResponse productResponse = productService.getProduct(id);
+        return new ResponseEntity<>(productResponse,HttpStatus.OK);
+    }
 
+    @GetMapping
+    public  ResponseEntity<List<ProductResponse>> getProductByCategory(@RequestParam("color") String color, @RequestParam("name") String name  ){
+        List<ProductResponse> productResponses = productService.getProductByNameAndColor(name,color);
+        return new ResponseEntity<>(productResponses,HttpStatus.OK);
+    }
 }
